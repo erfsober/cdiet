@@ -59,13 +59,14 @@ class AuthController extends Controller {
         if ( VerificationCode::inCoolDown($phone_number) ) {
             util()->throwError('لطفا چند دقیقه دیگر تلاش کنید!');
         }
+        if ( VerificationCode::exceedsDailyLimit($phone_number) ) {
+            util()->throwError('شما بیش از حد مجاز در روز درخواست کرده‌اید. لطفا فردا مجددا تلاش کنید!');
+        }
         VerificationCode::query()
                         ->create([
                                      'phone_number' => $phone_number ,
                                      'code' => $code ,
                                  ]);
-        // todo : send sms $code
-        util()->toDiscord("Phone: $phone_number - Code: $code");
         util()->toSms($phone_number , $code);
 
         return response()->json([

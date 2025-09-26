@@ -20,6 +20,15 @@ class VerificationCode extends Model {
         return false;
     }
 
+    public static function exceedsDailyLimit ( $phone_number ) {
+        $today_count = self::query()
+                           ->where('phone_number' , $phone_number)
+                           ->whereDate('created_at' , Carbon::today())
+                           ->count();
+
+        return $today_count >= 6;
+    }
+
     public function scopeNotUsed ( $query ) {
         return $query->whereNull('used_at');
     }
