@@ -78,11 +78,11 @@ class UserActivitiesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('food.title')
                     ->label('غذا')
                     ->default('-'),
-                Tables\Columns\TextColumn::make('exercise_id')
-                    ->label('شناسه ورزش')
+                Tables\Columns\TextColumn::make('exercise.title')
+                    ->label('ورزش')
                     ->default('-'),
-                Tables\Columns\TextColumn::make('recommended_meal_id')
-                    ->label('شناسه وعده')
+                Tables\Columns\TextColumn::make('recommendedMeal.title')
+                    ->label('وعده')
                     ->default('-'),
                 Tables\Columns\TextColumn::make('count')
                     ->label('تعداد')
