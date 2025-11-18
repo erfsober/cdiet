@@ -7,6 +7,7 @@ use App\Filament\Resources\UserResource\RelationManagers\CommentsRelationManager
 use App\Filament\Resources\UserResource\RelationManagers\CustomBurnedCaloriesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\CustomGainedCaloriesRelationManager;
 use App\Filament\Resources\UserResource\RelationManagers\NotesRelationManager;
+use App\Filament\Resources\UserResource\RelationManagers\UserActivitiesRelationManager;
 use App\Models\User;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -78,6 +79,7 @@ class UserResource extends Resource {
         return [
             NotesRelationManager::class ,
             CommentsRelationManager::class ,
+            UserActivitiesRelationManager::class ,
             CustomBurnedCaloriesRelationManager::class ,
             CustomGainedCaloriesRelationManager::class ,
         ];
