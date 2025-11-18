@@ -395,6 +395,14 @@ class User extends Authenticatable implements HasMedia {
         return $this->hasMany(UserActivity::class);
     }
 
+    public function customBurnedCalories (): HasMany {
+        return $this->hasMany(CustomBurnedCalorie::class);
+    }
+
+    public function customGainedCalories (): HasMany {
+        return $this->hasMany(CustomGainedCalorie::class);
+    }
+
     public function routeNotificationForFcm () {
         return $this->firebase_token;
     }
