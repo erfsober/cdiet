@@ -75,7 +75,7 @@ class UserActivitiesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('date')
                     ->label('تاریخ')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('food.name')
+                Tables\Columns\TextColumn::make('food.title')
                     ->label('غذا')
                     ->default('-'),
                 Tables\Columns\TextColumn::make('exercise_id')
