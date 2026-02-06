@@ -31,6 +31,13 @@ class GrokService {
             'content' => $message ,
         ];
 
+        return Http::timeout(60)->post('http://5.9.247.199/api/grok/send' , [
+                'api_token' => $this->api_token ,
+                'messages' => $messages ,
+                'max_completion_tokens' => (int)$ai_setting->max_completion_tokens,
+            ])
+            ->json()[ 'content' ];
+
         return Http::timeout(60)->withHeaders([
                                      'Authorization' => $this->api_token ,
                                  ])
