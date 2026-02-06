@@ -12,7 +12,15 @@ class GrokService {
     public function __construct () { $this->api_token = env('GROK_API'); }
 
     public function sendMessage ( $user_id , $message ) {
-        $messages = [];
+        $messages = Message::query()
+                           ->where('user_id' , $user_id)
+                           ->orderBy('id')
+                           ->take(2)
+                           ->get([
+                                     'role' ,
+                                     'content' ,
+                                 ])
+                           ->toArray();
         $ai_setting = AiSetting::query()->firstOrCreate([]);
         $messages[] = [
             'role' => 'system' ,
