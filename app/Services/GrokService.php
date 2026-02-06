@@ -31,12 +31,13 @@ class GrokService {
             'content' => $message ,
         ];
 
-        return Http::post('https://forwarder.concrete-town.top/api/grok/send' , [
-                'api_token' => $this->api_token ,
-                'messages' => $messages ,
-                'max_completion_tokens' => (int)$ai_setting->max_completion_tokens,
-            ])
-            ->json()[ 'content' ];
+        return Http::withHeaders([
+            'Accept-Encoding' => 'gzip',
+        ])->post('https://forwarder.concrete-town.top/api/grok/send', [
+            'api_token' => $this->api_token,
+            'messages' => $messages,
+            'max_completion_tokens' => (int) $ai_setting->max_completion_tokens,
+        ])->json()['content'];
 
         return Http::timeout(60)->withHeaders([
                                      'Authorization' => $this->api_token ,
