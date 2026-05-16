@@ -119,7 +119,7 @@ class User extends Authenticatable implements HasMedia {
             if ( !$this->register_completed || !$this->exercise || !$this->goal ) {
                 return 0;
             }
-            if ( $this->male ) {
+            if ( $this->is_male ) {
                 $result = ( $this->weight * 10 ) + ( $this->height * 6.25 ) - ( 5 * ( $this->age + $age_ratio ) );
             }
             else {
