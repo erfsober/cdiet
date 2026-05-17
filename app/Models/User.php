@@ -100,7 +100,7 @@ class User extends Authenticatable implements HasMedia {
         return Attribute::make(get: fn () => $age);
     }
 
-    protected function dailyCalorieNeeded (): Attribute {
+    /*protected function dailyCalorieNeeded (): Attribute {
         return Attribute::make(get: function () {
             $age_ratio = $this->is_male ? 5 : -161;
             if ( $this->goal == null && $this->target_weight && $this->exercise ) {
@@ -128,6 +128,88 @@ class User extends Authenticatable implements HasMedia {
             $result = self::EXERCISE_RATIOS[ $this->exercise ] * self::GOAL_RATIOS[ $this->goal ] * $result;
 
             return $result;
+        });
+    }*/
+
+    protected function dailyCalorieNeeded(): Attribute
+    {
+        return Attribute::make(get: function () {
+            // Check required fields
+            if (!$this->weight || !$this->height || !$this->age || !$this->exercise) {
+                return 0;
+            }
+
+            // ==========================================
+            // 1. Calculate BMR based on age and gender
+            // ==========================================
+            if ($this->age < 18) {
+                // Schofield formula for children and teens (age < 18)
+                // Height must be in meters for this formula
+                $heightInMeters = $this->height / 100;
+                if ($this->is_male) {
+                    $bmr = (16.25 * $this->weight) + (1372 * $heightInMeters) + 515;
+                } else {
+                    $bmr = (7.4 * $this->weight) + (482 * $heightInMeters) + 217;
+                }
+            } else {
+                // Mifflin-St Jeor formula for adults (age >= 18)
+                if ($this->is_male) {
+                    $bmr = (10 * $this->weight) + (6.25 * $this->height) - (5 * $this->age) + 5;
+                } else {
+                    $bmr = (10 * $this->weight) + (6.25 * $this->height) - (5 * $this->age) - 161;
+                }
+            }
+
+            // ==========================================
+            // 2. Activity multipliers (4 levels)
+            // ==========================================
+            $activityFactors = [
+                'کم'        => 1.375,
+                'متوسط'     => 1.55,
+                'زیاد'       => 1.725,
+                'خیلی زیاد'  => 1.9,
+            ];
+            $maintenance = $bmr * ($activityFactors[$this->exercise] ?? 1.375);
+
+            // ==========================================
+            // 3. Determine calorie adjustment
+            // Priority: target_weight (if set and different from current weight)
+            // Otherwise use the goal field
+            // ==========================================
+            $adjustment = 0;
+
+            if ($this->target_weight && $this->target_weight != $this->weight) {
+                if ($this->weight > $this->target_weight) {
+                    $adjustment = -500; // lose weight
+                } else {
+                    $adjustment = 500;  // gain weight
+                }
+            } elseif ($this->goal) {
+                switch ($this->goal) {
+                    case 'کاهش وزن':
+                        $adjustment = -500;
+                        break;
+                    case 'افزایش وزن':
+                        $adjustment = 500;
+                        break;
+                    case 'تثبیت وزن':
+                    default:
+                        $adjustment = 0;
+                        break;
+                }
+            }
+
+            $calories = $maintenance + $adjustment;
+
+            // ==========================================
+            // 4. Safety limits
+            // ==========================================
+            $minCalories = $this->is_male ? 1500 : 1200;
+            if ($calories < $minCalories) {
+                $calories = $minCalories;
+            }
+
+            return round($calories);
         });
     }
 
