@@ -31,13 +31,37 @@ class GrokService {
             'content' => $message ,
         ];
 
-        return Http::withHeaders([
-            'Accept-Encoding' => 'gzip',
-        ])->post('https://forwarder.concrete-town.top/api/grok/send', [
-            'api_token' => $this->api_token,
-            'messages' => $messages,
-            'max_completion_tokens' => (int) $ai_setting->max_completion_tokens,
-        ])->json()['content'];
+        $hosts = [
+            'https://forwarder.concrete-town.top' ,
+            'https://internal.acecoders.top' ,
+            'http://5.9.247.199' ,
+        ];
+
+        foreach ( $hosts as $host ) {
+            try {
+                $response = Http::timeout(60)
+                                ->withHeaders([
+                                                  'Accept-Encoding' => 'gzip' ,
+                                              ])
+                                ->post($host . '/api/grok/send' , [
+                                    'api_token' => $this->api_token ,
+                                    'messages' => $messages ,
+                                    'max_completion_tokens' => (int)$ai_setting->max_completion_tokens ,
+                                ]);
+            } catch ( \Throwable $e ) {
+                continue;
+            }
+
+            if ( ! $response->successful() ) {
+                continue;
+            }
+
+            $content = $response->json()[ 'content' ] ?? null;
+
+            if ( ! empty($content) ) {
+                return $content;
+            }
+        }
 
         return Http::timeout(60)->withHeaders([
                                      'Authorization' => $this->api_token ,
